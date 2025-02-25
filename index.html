@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClipIt</title>
+    <style>
+        /* Resetting some default browser styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(45deg, #00bfff, #ff1493);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            animation: gradientAnimation 5s infinite alternate;
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background: linear-gradient(45deg, #00bfff, #ff1493);
+            }
+            100% {
+                background: linear-gradient(45deg, #ff1493, #00bfff);
+            }
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .container:hover {
+            transform: scale(1.05);
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #ffffff;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1.1rem;
+            outline: none;
+            transition: background 0.3s ease;
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: #ff1493;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            background-color: #ff1493;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ff69b4;
+        }
+
+        .message {
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+
+        .message.success {
+            color: #32cd32;
+        }
+
+        .message.error {
+            color: #ff6347;
+        }
+
+        /* Style for ClipIt Heading (top-left corner with animation) */
+        .site-heading {
+            font-family: 'Arial', sans-serif;
+            font-size: 3rem;
+            color: white;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            opacity: 0;
+            animation: fadeInLeft 1s ease-in-out forwards;
+        }
+
+        @keyframes fadeInLeft {
+            0% {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Switch Color Panel Button (top-right corner) */
+        .switch-color-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border: none;
+            background-color: #ff7b00;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .switch-color-btn:hover {
+            background-color: #ff4500;
+        }
+    </style>
+</head>
+<body class="color-panel-1">
+
+    <h1 class="site-heading">ClipIt</h1>  <!-- Heading positioned top-left -->
+
+    <button class="switch-color-btn" onclick="switchColorPanel()">Switch Color Panel</button>  <!-- Button positioned top-right -->
+
+    <div class="container">
+        <h2>Download Your Video</h2>
+        <input type="text" id="videoURL" placeholder="Enter video URL">
+        <button onclick="downloadVideo()">Download</button>
+        <p class="message" id="message"></p>
+    </div>
+
+    <script>
+        // Toggle color panel function
+        let currentPanel = 1;
+
+        function switchColorPanel() {
+            currentPanel = (currentPanel % 3) + 1;
+
+            document.body.classList.remove('color-panel-1', 'color-panel-2', 'color-panel-3');
+            document.body.classList.add('color-panel-' + currentPanel);
+        }
+
+        function downloadVideo() {
+            let url = document.getElementById("videoURL").value;
+            let message = document.getElementById("message");
+
+            if (url.trim() === "") {
+                message.innerText = "Please enter a valid video URL.";
+                message.className = "message error";
+                return;
+            }
+
+            let serverUrl = "http://127.0.0.1:5000/download?url=" + encodeURIComponent(url);
+
+            fetch(serverUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Error: Unable to download video.");
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    let a = document.createElement("a");
+                    a.href = URL.createObjectURL(blob);
+                    a.setAttribute("download", "video.mp4");
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+
+                    message.innerText = "Download started!";
+                    message.className = "message success";
+                })
+                .catch(error => {
+                    message.innerText = error.message;
+                    message.className = "message error";
+                });
+        }/* Updated ClipIt Heading with Stylish Font and Animated Border */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+.site-heading {
+    font-family: 'Orbitron', sans-serif; /* Futuristic and sleek font */
+    font-size: 3rem;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    opacity: 0;
+    padding: 10px 20px;
+    border: 3px solid transparent;
+    border-radius: 8px;
+    animation: fadeInLeft 1s ease-in-out forwards, glowBorder 2s infinite alternate;
+}
+
+/* Slide-in effect */
+@keyframes fadeInLeft {
+    0% {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Glowing border animation */
+@keyframes glowBorder {
+    0% {
+        border-color: #ff1493;
+        box-shadow: 0 0 10px #ff1493;
+    }
+    50% {
+        border-color: #00bfff;
+        box-shadow: 0 0 15px #00bfff;
+    }
+    100% {
+        border-color: #ff1493;
+        box-shadow: 0 0 10px #ff1493;
+    }
+}
+
+
+<div class="site-description">
+    <p>🚀 ClipIt – The ultimate tool for downloading your favorite videos instantly. Fast, secure, and hassle-free! 🎬✨</p>
+</div>
+
+<style>
+    .site-description {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 1.2rem;
+        color: white;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-align: center;
+        max-width: 80%;
+        font-weight: 500;
+        animation: fadeIn 1.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+        100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+</style>
+
+    </script>
+</body>
+</html>
